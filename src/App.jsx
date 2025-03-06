@@ -12,9 +12,11 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Footer from './components/Footer'
 import Profile from './pages/Profile'
+import AddListing from "./pages/AddListing";
 import Notfound from "./pages/Notfound";
 
 import {app} from './FirebaseConnect'
+
 const auth = getAuth(app);
 
 function App() {
@@ -45,6 +47,7 @@ useEffect(() => {
         <Route path="/login" element={< Login/>} />
         <Route path="/signup" element={<Signup/>} />
         <Route path="/profile" element={<Profile/>} />
+        <Route path="/add-listing" element={<AddListing user={user}/>} />
         <Route path="/*" element={<Notfound/>} />
       </Routes>
       <Footer/>

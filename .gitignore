@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# as we entered db connection url to drizzle.config.js we will not push it to github
+.drizzle.config.js 
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
