@@ -13,8 +13,11 @@ const Navbar = ({ user }) => {
         </Link>
 
         <div className='my-auto flex gap-3 text-base font-semibold text-white'>
-          <Link to="/contact">Contact</Link>
-          <Link to="/about">About</Link>
+          <Link className='hover:text-gray-200 transition-all duration-200' to="/marketplace">Marketplace</Link>
+          <Link className='hover:text-gray-200 transition-all duration-200' to="/shelflife">Shelf Life</Link>
+          <Link className='hover:text-gray-200 transition-all duration-200' to="/weather">Weather</Link>
+          <Link className='hover:text-gray-200 transition-all duration-200' to="/contact">Contact</Link>
+          <Link className='hover:text-gray-200 transition-all duration-200' to="/about">About</Link>
         </div>
 
         <div className='my-auto pr-5'>
@@ -35,6 +38,9 @@ const Navbar = ({ user }) => {
         </Link>
 
         <div className='my-auto flex gap-3 text-base font-semibold text-white'>
+        <Link className='hover:text-gray-200 transition-all duration-200' to="/marketplace">Marketplace</Link>
+        <Link className='hover:text-gray-200 transition-all duration-200' to="/shelflife">Shelf Life</Link>
+        <Link className='hover:text-gray-200 transition-all duration-200' to="/weather">Weather</Link>
           <Link className='hover:text-gray-200 transition-all duration-200' to="/contact">Contact</Link>
           <Link className='hover:text-gray-200 transition-all duration-200' to="/about">About</Link>
         </div>

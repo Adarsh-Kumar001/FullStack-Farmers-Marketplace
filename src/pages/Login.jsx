@@ -33,6 +33,10 @@ const Login = () => {
     }
   };
 
+  const handleReset =()=>{
+    window.location.href = '/forgotpass'
+  }
+
 
   return (
     <div>
@@ -80,8 +84,8 @@ const Login = () => {
               <div className="mt-6 flex items-center justify-between">
 
 
-                <div className="text-sm leading-5">
-                  <a href="#"
+                <div className="text-sm leading-5 hover:cursor-pointer">
+                  <a onClick={handleReset}
                     className="font-medium text-blue-500 hover:text-blue-500 focus:outline-none focus:underline transition ease-in-out duration-150">
                     Forgot your password?
                   </a>

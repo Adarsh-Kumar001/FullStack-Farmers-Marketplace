@@ -1,56 +1,56 @@
-import React, { useEffect, useState } from 'react'
+import React,{ useState, useEffect } from 'react'
+
 import { Link } from 'react-router-dom'
 
 import { db } from '../../config'
-import { eq, notLike } from 'drizzle-orm'
+import { eq, ilike, and, not } from 'drizzle-orm'
 
 import { ItemListing } from '../../config/schema'
 import { ItemImages } from '../../config/schema'
 
+const Search = ({user}) => {
 
+   const [marketplaceItems, setmarketplaceItems] = useState([])
 
-const Marketplace = ({ user }) => {
+  const [searchTerm, setsearchTerm] = useState([])
 
-    const [marketplaceItems, setmarketplaceItems] = useState([])
+  const getListings = async () => {
+    const result = await db.select().from(ItemListing)
+    .leftJoin(ItemImages, eq(ItemListing.id, ItemImages.ItemListingId))
+    .where(and(
+        ilike(ItemListing.productName, `%${searchTerm}%`),
+        not(eq(ItemListing.postedBy, user.email)) 
+    ));
+  
+          // Group listings by id so that unique itmImages.itemListingId matches itemListing.id
+          const listingsMap = new Map();
+  
+          result.forEach(({ itemListing, itemImages }) => {
+              if (!listingsMap.has(itemListing.id)) {
+                  listingsMap.set(itemListing.id, {
+                      ...itemListing,
+                      images: itemImages ? [itemImages.imageUrl] : [],
+                  });
+              } else if (itemImages) {
+                  listingsMap.get(itemListing.id).images.push(itemImages.imageUrl);
+              }
+          });
+  
+          const listings = Array.from(listingsMap.values());
+  
+          setmarketplaceItems(listings);
+  
+          console.log(listings);
+  
+      };
+  
+      useEffect(() => {
+          getListings();
+      }, [searchTerm])
 
-
-    const getListings = async () => {
-        const result = await db.select().from(ItemListing)
-            .leftJoin(ItemImages, eq(ItemListing.id, ItemImages.ItemListingId))
-            .where(notLike(ItemListing.postedBy, user.email))
-
-        // Group listings by id so that unique itmImages.itemListingId matches itemListing.id
-        const listingsMap = new Map();
-
-        result.forEach(({ itemListing, itemImages }) => {
-            if (!listingsMap.has(itemListing.id)) {
-                listingsMap.set(itemListing.id, {
-                    ...itemListing,
-                    images: itemImages ? [itemImages.imageUrl] : [],
-                });
-            } else if (itemImages) {
-                listingsMap.get(itemListing.id).images.push(itemImages.imageUrl);
-            }
-        });
-
-        const listings = Array.from(listingsMap.values());
-
-        setmarketplaceItems(listings);
-
-        console.log(listings);
-
-    };
-
-    useEffect(() => {
-        getListings();
-    }, [user])
-
-
-    return (
-        <div className='w-full flex flex-col'>
-
-           <Link to="/search">
-            <form class="w-[40rem] mx-auto mt-8 mb-3">
+  return (
+    <div className='w-full'>
+      <form class="w-[40rem] mx-auto mt-8 mb-3">
                 <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -58,11 +58,10 @@ const Marketplace = ({ user }) => {
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                         </svg>
                     </div>
-                    <input type="search" id="default-search" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Search for products..." />
+                    <input onChange={(e)=>setsearchTerm(e.target.value)} id="default-search" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Search for products..." />
                     
                  </div>
             </form>
-            </Link>
 
             <div className='w-full flex flex-wrap p-5 text-white font-semibold capitalize gap-5'>
                 {marketplaceItems && marketplaceItems.map((item, index) => (
@@ -83,7 +82,8 @@ const Marketplace = ({ user }) => {
                     </Link>
                 ))}
             </div>
-        </div>
-    )
+    </div>
+  )
 }
-export default Marketplace
+
+export default Search

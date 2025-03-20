@@ -1,37 +1,62 @@
 import React, { useState } from 'react'
 
+import { ToastContainer, toast } from "react-toastify";
+
 import { db } from '../../config/index.js'
 import { ItemListing } from '../../config/schema.js'
 import UploadImages from '../components/UploadImages.jsx'
 
+import { BiLoaderAlt } from "react-icons/bi";
+
+
+import moment from 'moment'
 
 function AddListing({ user }) {
 
   const [formData, setformData] = useState([])
 
+  const [triggerUploadImages, settriggerUploadImages] = useState()
+
+  const [Loader, setLoader] = useState(false)
+
   const handleInput = (name, value) => {
     setformData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
+      
     }))
 
     console.log(formData)
   }
 
   const submitForm = async (e) => {
+
+    setLoader(true);
+
     e.preventDefault()
 
     if (!formData.productName || !formData.sellingPrice || !formData.description) {
-      alert("Please fill in all required fields.")
+      toast.error("Please fill in all fields", { position: "top-center" });
+      setLoader(false)
     }
     else if (formData.productName && formData.sellingPrice) {
       try{
-      const result = await db.insert(ItemListing).values(formData)
+      const result = await db.insert(ItemListing).values({
+        ...formData,
+        postedBy: user.email,
+        postedDate: moment().format('DD/MM/yyyy')
+      },
+    ).returning({id:ItemListing.id})
       if (result) {
         console.log("data saved")
+        settriggerUploadImages(result[0]?.id)
+        toast.success("Data Saved!", { position: "top-center" });
+        setLoader(false)
       }
     }catch(e){
       console.log("errror is",e)
+      setLoader(false)
+      toast.error(e, { position: "top-center" });
     }
     }
 
@@ -42,7 +67,7 @@ function AddListing({ user }) {
     return (
       <div className='w-full items-center'>
 
-        <form className='w-[50%] flex flex-col mx-auto  rounded border-2 border-gray-700 p-4 mt-10'>
+        <form className='w-[55%] flex flex-col mx-auto rounded border-2 border-gray-700 p-4 mt-10'>
           <h2 className='font-bold text-2xl mb-2'>Product Details</h2>
           <div className='flex justify-between w-[100%]'>
             <div className='flex flex-col mb-2'>
@@ -57,7 +82,7 @@ function AddListing({ user }) {
 
           <div className='flex flex-col mb-2'>
             <p className='font-semibold'>Product Description</p>
-            <textarea name='description' onChange={(e) => handleInput(e.target.name, e.target.value)} className='resize-none p-2 border-2 border-black rows="4" cols="50"' type="text"></textarea>
+            <textarea name='description' onChange={(e) => handleInput(e.target.name, e.target.value)} className='resize-none p-2 border-2 border-black w-[100%] h-[7rem]' type="text"></textarea>
           </div>
 
 
@@ -83,19 +108,23 @@ function AddListing({ user }) {
           </div>
 
           
-        <UploadImages/>
+        <UploadImages triggerUploadImages={triggerUploadImages} setLoader={(v)=>setLoader(v)}/>
         
           <button type='submit' onClick={(e) => submitForm(e)} className="w-[8rem] flex justify-center mx-auto mt-3 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
-            Submit
+            <div>
+              {Loader?<BiLoaderAlt className='animate-spin text-xl font-bold'/>:"Submit"}
+            </div>
+            
           </button>
         </form>
 
+        <ToastContainer />
 
       </div>
     )
   }
   else {
-    alert("Please Login to submit listing")
+    alert("Please Login to submit a listing")
   }
 }
 
