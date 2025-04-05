@@ -45,7 +45,7 @@ const Marketplace = ({ user }) => {
         getListings();
     }, [user])
 
-
+    if(user){
     return (
         <div className='w-full flex flex-col'>
 
@@ -85,5 +85,16 @@ const Marketplace = ({ user }) => {
             </div>
         </div>
     )
+}
+else{
+    return(
+    <div className='flex flex-col w-full h-full bg-gray-100 pt-[15rem]'>
+        <h1 className='m-auto text-3xl'>Kindly Login to access the marketplace</h1>
+        <Link to='/login' className='m-auto pb-[11rem]'>
+        <p className='text-red-700 hover:text-blue-600 m-auto'>Click here to go to login page...</p>
+        </Link>
+    </div>
+    )
+}
 }
 export default Marketplace

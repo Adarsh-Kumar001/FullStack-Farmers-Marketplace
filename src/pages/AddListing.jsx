@@ -1,15 +1,17 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { ToastContainer, toast } from "react-toastify";
 
+import { eq } from 'drizzle-orm';
 import { db } from '../../config/index.js'
-import { ItemListing } from '../../config/schema.js'
+import { ItemImages, ItemListing } from '../../config/schema.js'
 import UploadImages from '../components/UploadImages.jsx'
 
 import { BiLoaderAlt } from "react-icons/bi";
 
-
 import moment from 'moment'
+
+import { useSearchParams } from 'react-router-dom';
 
 function AddListing({ user }) {
 
@@ -17,7 +19,11 @@ function AddListing({ user }) {
 
   const [triggerUploadImages, settriggerUploadImages] = useState()
 
+  const [searchParams] = useSearchParams();
+
   const [Loader, setLoader] = useState(false)
+
+  const [itemEditInfo, setitemEditInfo] = useState()
 
   const handleInput = (name, value) => {
     setformData((prevData) => ({
@@ -62,6 +68,27 @@ function AddListing({ user }) {
 
 
   }
+
+  const mode = searchParams.get("mode");
+  const itemId = searchParams.get("id");
+
+  useEffect(() => {
+    if(mode == "edit"){
+      getItemDeatils()
+    }
+  }, [])
+  
+
+  const getItemDeatils= async()=>{
+    const result = await db.select().from(ItemListing)
+    .innerJoin(ItemImages, eq(ItemListing.id, ItemImages.ItemListingId))
+    .where(eq(ItemListing.id,itemId));
+
+    setitemEditInfo(result[0])
+
+    console.log(itemEditInfo)
+  }
+
 
   if (user) {
     return (
@@ -122,9 +149,6 @@ function AddListing({ user }) {
 
       </div>
     )
-  }
-  else {
-    alert("Please Login to submit a listing")
   }
 }
 

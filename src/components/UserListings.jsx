@@ -46,6 +46,9 @@ const UserListings = ({ user }) => {
         getUserListings();
     }, [user])
 
+    const handleEdit=(id)=>{
+        window.location.href = `/add-listing?mode=edit&id=${id}`
+    }
 
     return (
 
@@ -57,7 +60,9 @@ const UserListings = ({ user }) => {
                     <h3 className='pl-2 mx-3 border-b border-slate-200'>{item.productName}</h3>
                     <p className='pl-5 pt-2'>&#8377;{item.sellingPrice}</p>
                     <div className='flex text-3xl relative w-[100%] justify-between pt-1'>
-                        <MdOutlineEdit className='bg-yellow-500 w-[50%] rounded-bl-lg p-1 hover:bg-yellow-600'/>
+                        
+                        <MdOutlineEdit onMouseDown={()=>handleEdit(item.id)} className='bg-yellow-500 w-[50%] rounded-bl-lg p-1 hover:bg-yellow-600'/>
+                    
                         <MdDeleteOutline className='bg-red-500 w-[50%] rounded-br-lg p-1 hover:bg-red-600'/>
                     </div>
                 </div>
